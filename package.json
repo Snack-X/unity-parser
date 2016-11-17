@@ -1,0 +1,11 @@
+{
+  "name": "UnityBundle.js",
+  "version": "1.0.0",
+  "description": "UnityBundle, UnityAsset parser in Node.js",
+  "main": "index.js",
+  "author": "Snack <korsnack@korsnack.kr>",
+  "license": "MIT",
+  "dependencies": {
+    "lz4": "^0.5.3"
+  }
+}
