@@ -1,8 +1,5 @@
 "use strict";
 
-// Ref: https://github.com/marcan/deresuteme/blob/master/decode.py
-// Ref: https://github.com/RaduMC/UnityStudio
-
 const ClassId = require("./const").classId;
 
 //==============================================================================

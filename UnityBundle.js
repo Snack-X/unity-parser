@@ -1,10 +1,8 @@
 "use strict";
 
-// Ref: https://github.com/marcan/deresuteme/blob/master/decode.py
-// Ref: https://github.com/RaduMC/UnityStudio
-
 const BufferStream = require("./BufferStream");
 const BaseString = require("./const").baseStrings;
+
 const UnityAsset = require("./UnityAsset");
 
 //==============================================================================
