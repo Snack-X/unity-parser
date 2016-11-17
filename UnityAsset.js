@@ -178,6 +178,16 @@ function readUnityAssetData(stream, definition) {
         return buf.readUInt8(0);
       case "unsigned int":
         return stream.isBigEndian ? buf.readUInt32BE(0) :  buf.readUInt32LE(0);
+      case "int64":
+        if(definition.name !== "m_PathID") return buf;
+        if(stream.isBigEndian) {
+          return leftZeroPad(buf.readUInt32BE(0).toString(16), 8) +
+                 leftZeroPad(buf.readUInt32BE(4).toString(16), 8);
+        }
+        else {
+          return leftZeroPad(buf.readUInt32LE(4).toString(16), 8) +
+                 leftZeroPad(buf.readUInt32LE(0).toString(16), 8);
+        }
     }
 
     return buf;
