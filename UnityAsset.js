@@ -1,5 +1,6 @@
 "use strict";
 
+const BaseString = require("./const").baseStrings;
 const ClassId = require("./const").classId;
 
 //==============================================================================

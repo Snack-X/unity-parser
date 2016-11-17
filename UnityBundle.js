@@ -1,7 +1,6 @@
 "use strict";
 
 const BufferStream = require("./BufferStream");
-const BaseString = require("./const").baseStrings;
 
 const UnityAsset = require("./UnityAsset");
 
