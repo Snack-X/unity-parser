@@ -1,6 +1,6 @@
 {
   "name": "UnityBundle.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "UnityBundle, UnityAsset parser in Node.js",
   "main": "index.js",
   "author": "Snack <korsnack@korsnack.kr>",

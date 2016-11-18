@@ -124,6 +124,7 @@ function parseUnityAsset(filename, stream) {
 
       let dataType = ClassId[type2];
       let assetData = readUnityAssetData(stream, definition[type1]);
+      assetData._type = dataType;
       data[pathId] = assetData;
       stream.pos = savepoint;
     }
@@ -188,6 +189,9 @@ function readUnityAssetData(stream, definition) {
           return leftZeroPad(buf.readUInt32LE(4).toString(16), 8) +
                  leftZeroPad(buf.readUInt32LE(0).toString(16), 8);
         }
+      // NEEDS MORE INVESTIGATION
+      // - map : Array of { first, second } should be mapped as an object?
+      // - Hash128 : bytes[0] to bytes[15] as one string/buffer?
     }
 
     return buf;
