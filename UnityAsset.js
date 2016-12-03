@@ -77,7 +77,7 @@ function parseUnityAsset(filename, stream) {
           BaseString[varNameIndex] || varNameIndex.toString()
         );
 
-        let size = stream.readUInt32();
+        let size = stream.readInt32();
         let index = stream.readUInt32();
         let flags = stream.readUInt32();
 
@@ -133,10 +133,13 @@ function parseUnityAsset(filename, stream) {
   return { definition, data };
 }
 
-function readUnityAssetData(stream, definition) {
+function readUnityAssetData(stream, definition, parentPath = "") {
+  let defPath = parentPath + (parentPath ? "->" : "");
+  defPath += `${definition.name}:${definition.type}`;
+
   if(definition.isArray) {
     let defArraySize = definition.children[0];
-    let arrSize = readUnityAssetData(stream, defArraySize);
+    let arrSize = readUnityAssetData(stream, defArraySize, defPath);
 
     let defArrayValue = definition.children[1];
     if(defArrayValue.type === "UInt8" || defArrayValue.type === "char")
@@ -144,14 +147,14 @@ function readUnityAssetData(stream, definition) {
     else {
       let output = [];
       for(let i = 0 ; i < arrSize ; i++)
-        output.push(readUnityAssetData(stream, defArrayValue));
+        output.push(readUnityAssetData(stream, defArrayValue, defPath));
       return output;
     }
   }
   else if(0 < definition.children.length) {
     let values = {};
     for(let childDef of definition.children)
-      values[childDef.name] = readUnityAssetData(stream, childDef);
+      values[childDef.name] = readUnityAssetData(stream, childDef, defPath);
 
     if(definition.children.length === 1 && definition.type === "string")
       return values["Array"].toString("binary");
@@ -159,26 +162,28 @@ function readUnityAssetData(stream, definition) {
     return values;
   }
   else {
-    let alignBy = Math.min(definition.size, 4);
-    stream.align(alignBy);
+    // Dirty fixes ¯\_(ツ)_/¯
+    // Ref: RaduMC/UnityStudio/Unity Studio/Unity Classes/SkinnedMeshRenderer.cs#L44-L48
+    if(defPath === "Base:SkinnedMeshRenderer->m_Enabled:bool" ||
+       defPath === "Base:SkinnedMeshRenderer->m_ReceiveShadows:bool")
+      stream.align(4);
+    else {
+      let alignBy = Math.min(definition.size, 4);
+      stream.align(alignBy);
+    }
 
     let buf = stream.read(definition.size);
 
     switch(definition.type) {
-      case "int":
-        return stream.isBigEndian ? buf.readInt32BE(0) :  buf.readInt32LE(0);
-      case "char":
-        return String.fromCharCode(buf.readInt8(0));
       case "bool":
         return buf.readInt8(0) === 1;
-      case "float":
-        return stream.isBigEndian ? buf.readFloatBE(0) :  buf.readFloatLE(0);
-      case "UInt16":
-        return stream.isBigEndian ? buf.readUInt16BE(0) :  buf.readUInt16LE(0);
-      case "UInt8":
-        return buf.readUInt8(0);
-      case "unsigned int":
-        return stream.isBigEndian ? buf.readUInt32BE(0) :  buf.readUInt32LE(0);
+
+      case "char":
+        return String.fromCharCode(buf.readInt8(0));
+      case "SInt16":
+        return stream.isBigEndian ? buf.readInt16BE(0) :  buf.readInt16LE(0);
+      case "int":
+        return stream.isBigEndian ? buf.readInt32BE(0) :  buf.readInt32LE(0);
       case "int64":
         if(definition.name !== "m_PathID") return buf;
         if(stream.isBigEndian) {
@@ -189,6 +194,16 @@ function readUnityAssetData(stream, definition) {
           return leftZeroPad(buf.readUInt32LE(4).toString(16), 8) +
                  leftZeroPad(buf.readUInt32LE(0).toString(16), 8);
         }
+
+      case "UInt8":
+        return buf.readUInt8(0);
+      case "UInt16":
+        return stream.isBigEndian ? buf.readUInt16BE(0) :  buf.readUInt16LE(0);
+      case "unsigned int":
+        return stream.isBigEndian ? buf.readUInt32BE(0) :  buf.readUInt32LE(0);
+
+      case "float":
+        return stream.isBigEndian ? buf.readFloatBE(0) :  buf.readFloatLE(0);
       // NEEDS MORE INVESTIGATION
       // - map : Array of { first, second } should be mapped as an object?
       // - Hash128 : bytes[0] to bytes[15] as one string/buffer?
