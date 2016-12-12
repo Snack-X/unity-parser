@@ -204,6 +204,7 @@ function readUnityAssetData(stream, definition, parentPath = "") {
 
       case "float":
         return stream.isBigEndian ? buf.readFloatBE(0) :  buf.readFloatLE(0);
+
       // NEEDS MORE INVESTIGATION
       // - map : Array of { first, second } should be mapped as an object?
       // - Hash128 : bytes[0] to bytes[15] as one string/buffer?
