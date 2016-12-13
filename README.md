@@ -1,6 +1,6 @@
-# UnityBundle.js
+# Unity Parser
 
-Highly experimental UnityBundle/UnityAsset parser in Node.js.
+Highly experimental UnityBundle, UnityAsset parser in Node.js.
 
 Work in progress.
 
