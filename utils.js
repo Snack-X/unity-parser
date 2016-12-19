@@ -12,8 +12,6 @@ module.exports.unlz4 = function(bufIn) {
   let endPos = dataSize + 16;
   stream.pos = 16;
 
-  console.log()
-
   let output = Buffer.alloc(decompressedSize);
   let outputPos = 0;
 
